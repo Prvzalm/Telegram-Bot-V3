@@ -1,36 +1,20 @@
-const TelegramBot = require("node-telegram-bot-api");
+const { Telegraf } = require('telegraf');
+const express = require('express');
+const { message } =  require('telegraf/filters')
 
-// Replace with your Telegram bot token
-const botToken = "6370448394:AAGaA-FFH92-lylUkKBPF321PkuCppcVBug";
+const app = express();
 
-// Create a new Telegram bot
-const bot = new TelegramBot(botToken, { polling: true });
+const botToken = '6370448394:AAGaA-FFH92-lylUkKBPF321PkuCppcVBug';
 
-bot.onText(/\/start/, (msg) => {
-  bot.sendMessage(msg.chat.id, "recieved")
+const bot = new Telegraf(botToken);
+
+bot.on('chat_member', (ctx) => {
+  console.log(ctx.chatMember.invite_link.invite_link)
 })
 
-// Listen for chat member updates
-bot.on("chatMemberUpdated", async (update) => {
-
-  try {
-    const chatId = await update.chat.id;
-    const newMember = await update.message.new_chat_member;
-
-    // Check if a new member joined
-    if (newMember) {
-      const chatInviteLink = await update.message.chat_invite_link;
-
-      if (chatInviteLink) {
-        console.log(
-          `New member ${newMember.first_name} joined in chat ${chatId}`
-        );
-        console.log(`Chat Invite Link: ${chatInviteLink}`);
-      } else {
-        console.log(`Chat Invite Link not available for chat ${chatId}`);
-      }
-    }
-  } catch (error) {
-    console.log(error)
-  }
+// Start the bot
+bot.launch({
+  allowedUpdates : ['chat_member']
+}).then(() => {
+  console.log('Bot is running');
 });
